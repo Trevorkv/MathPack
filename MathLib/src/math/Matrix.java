@@ -5,12 +5,9 @@
  */
 package math;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 /**
  * Description: A model of a mathematical matrix and its functionalities
- * @author Trevor
+ * @author Trevor Klein Villanueva
  */
 public class Matrix{
     
@@ -20,314 +17,96 @@ public class Matrix{
     
     private double[][] matrix;
 
+    /**
+     * Default Constructor
+     */
+    public Matrix()
+    {
+        rowSize = 0;
+        colSize = 0;        
+        matrix = new double[rowSize][colSize];
+        determinant = 0;
+    }
     
-//    public Matrix(int row, int col)
-//    {
-//        rowSize = row;
-//        colSize = col;
-//        
-//        
-//        matrix = new double[row][col];
-//    }
-    
-    public Matrix(int row, int col, double[][] matrix)
+    /**
+     * Overloaded Constructor
+     * @param row
+     * @param col 
+     */
+    public Matrix(int row, int col)
     {
         rowSize = row;
-        colSize = col;
-        determinant = initDeterminant();
-        
-        this.matrix = matrix;
+        colSize = col;        
+        matrix = new double[rowSize][colSize];
+        determinant = initDet();
     }
-    
-    
-    
-    public double initDeterminant()
-    {
-        //use getSubMatrix
-        Matrix temp = new Matrix(rowSize, colSize, matrix);
-        determinant = 1;
-        
-        if(rowSize == colSize)
-        {
-            determinant = Double.NaN;
-            temp = getRREF();
-            determinant = multiplyDiag() * determinant;
-        }
-        
-        return determinant;
-    }
-    
-    
-    //Intended for square matrices only
-    public double multiplyDiag()
-    {
-        double product = 1;
-        for(int i = 0; i < colSize; i++)
-        {
-            product *= matrix[i][i];
-        }
-        
-        return product;
-    }
-    
-    
-    //search up a way to return randomized generics
-    //return a fixed sized matrix with random elements
+
     /**
-     * Description: Returns a matrix with dimension set by row and column and 
-     *              random integer elements
-     * @param row
-     * @param col
-     * @return the randomly generated Integer matrix with fixed rows and columns
+     * Overloaded Constructor
+     * @param matrix 
      */
-//    public static Matrix getIntMatrix(int row, int col)
-//    {
-//        Matrix matrix = new Matrix(row,col);
-//        
-//        for(int i = 0; i < row*col; i++)
-//        {
-//            matrix.matrix.set(i, new Random().nextInt());
-//        }
-//        
-//        return matrix;
-//    }
-//    
-//    /**
-//     * Description: Returns a matrix with dimension set by row and column and 
-//     *              random float elements
-//     * @param row
-//     * @param col
-//     * @return the randomly generated float matrix with fixed rows and columns
-//     */
-//    public static Matrix getFloatMatrix(int row, int col)
-//    {
-//        Matrix matrix = new Matrix(row,col);
-//        
-//        for(int i = 0; i < row*col; i++)
-//        {
-//            matrix.matrix.set(i, new Random().nextFloat());
-//        }
-//        
-//        return matrix;
-//    }
-    
-    
-    public int getColSize()
+    public Matrix(double[][] matrix)
     {
-        return colSize;
+        rowSize = matrix.length;
+        rowSize = matrix[0].length;
+        this.matrix = matrix;
+        determinant = initDet();
     }
     
+    /**
+     * Description: returns rowSize
+     * @return rowSize Integer that represents the number of rows in the 
+                                matrix.
+     */
     public int getRowSize()
     {
         return rowSize;
     }
     
+    /**
+     * Description: returns colSize
+     * @return colSize Integer that represents the number of columns in
+                        the matrix.
+     */
+    public int getcolSize()
+    {
+        return colSize;
+    }
+    
+    /**
+     * Description: returns matrix
+     * @return matrix A two dimensional array of type double to store 
+                      numbers to represent the matrix.
+     */
     public double[][] getMatrix()
     {
         return matrix;
     }
     
-    
     /**
-     * Description: Returns a matrix with dimension set by row and column and 
-     *              random double elements
-     * @param row
-     * @param col
-     * @return the randomly generated double matrix with fixed rows and columns
+     * Description: returns determinant
+     * @return determinant A double type representing the determinant of the 
+     *          matrix.
      */
-    public static Matrix getRandMatrix(int row, int col)
+    public double getDet()
     {
-        Matrix matrix = new Matrix(row,col, new double[row][col]);
-        
-        for(int i = 0; i < row; i++)
-        {
-            for(int j = 0; j < col; j++)
-            {
-                matrix.matrix[i][j] = new Random().nextDouble();
-            }
-        }
-        
-        return matrix;
-    }
-    
-    
-    /**
-     * Description: returns the specified element of the matrix according to its 
-     *              row and column
-     * @param row
-     * @param col
-     * @return the specified element according to the row and column coordinates
-     */
-    public double getElement(int row, int col)
-    {
-       double ret = Double.MAX_VALUE;
-       if(row * col >= 0)
-           ret = matrix[row][col];
-       return ret;      
-    }
-    
-    
-    /**
-     * Description: assigns val to the specified row by column element and 
-     *              returns true if successful.
-     * @param row
-     * @param col
-     * @param val
-     * @return a boolean to determine the success of assigning a new value to 
-     *          the matrix element.
-     */
-    public boolean setElement(int row, int col, double val)
-    {
-        boolean bool = true;
-        
-        if(row >= 0 && col >= 0)
-            matrix[row][col] = val;
-        else
-            bool = false;
-        
-        return bool;
+        return determinant;
     }
 
-    
-    public double[] getRow(int row)
-    {
-        double[] ret = null;
-        
-        if(row < rowSize)
-            ret = matrix[row];
-        
-        return ret;
-    }
-    
-    
-    public double[] getCol(int col)
-    {
-        double[] ret = null;
-        
-        if(col < rowSize)
-        {
-            ret = new double[rowSize];
-            for(int i = 0; i < rowSize; i++)
-            {
-                ret[i] = matrix[i][col];
-            }
-        }
-        
-        return ret;
-    }
-    
-    
-    public Matrix getSubMatrix(int rowStart, int rowEnd, int colStart, 
-            int colEnd)
-    {
-        int newRowDim = rowEnd - rowStart;
-        int newColDim = colEnd - colStart;
-        
-        double[][] mat = new double[newRowDim][newColDim];
-        
-        for(int i = 0; i < newRowDim; i++)
-        {
-            mat[i] = this.getRow(i);
-        }
-        
-        Matrix ret = new Matrix(rowEnd - rowStart,colEnd - colStart, mat);
-        
-        return ret;
-        
-    }
-    
     /**
-     * Description: returns the Reduced Echelon Form of the current
-     *          instance's matrix
-     * @return a matrix in Reduced Echelon Form
+     * Description: assigns a new value to the matrix variable
+     * @param matrix a two dimensional array of type double
      */
-    public Matrix getRREF()
-    {
-        Matrix ref = null;
-        
-        if(this.matrix == null)
-            throw new NullPointerException();
-        else
-        {
-            ref = new Matrix(rowSize,colSize, matrix);
-            int rowIndex = 0;
-            int colIndex = 0;
-            
-            while(rowIndex < rowSize && colIndex < colSize)
-            {
-                for(int i = rowIndex; i < rowSize; i++)
-                {
-                    if(ref.matrix[i][colIndex] != 0)
-                    {
-                        ref.scale(i, 1.0 / ref.matrix[i][colIndex]);
-                        ref.replaceRows(i, -ref.matrix[i][colIndex]);
-                        ref.interchange(i, rowIndex);
-                        rowIndex++;
-                        colIndex++;
-                        break;
-                    }
-                }
-            }
-        }
-        
-        return ref;
+    public void setMatrix(double[][] matrix) {
+        this.matrix = matrix;
+        rowSize = this.matrix.length;
+        colSize = this.matrix[0].length;
     }
-    
-    
-//    public Matrix getREF()
-//    {
-//        Matrix ref = null;
-//        
-//        if(this.matrix == null)
-//            throw new NullPointerException();
-//        else
-//        {
-//            ref = new Matrix(rowSize,colSize, matrix);
-//            int rowIndex = 0;
-//            int colIndex = 0;
-//            
-//            while(rowIndex < rowSize && colIndex < colSize)
-//            {
-//                for(int i = rowIndex; i < rowSize; i++)
-//                {
-//                    if(ref.matrix[i][colIndex] != 0)
-//                    {
-//                        ref.scale(i, 1.0 / ref.matrix[i][colIndex]);
-//                        ref.replaceRows(i, -ref.matrix[i][colIndex]);
-//                        ref.interchange(i, rowIndex);
-//                        rowIndex++;
-//                        colIndex++;
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//        
-//        return ref;
-//    }
-    
-    
-    
-    /**
-     * Description: replaces multiple rows excluding the source with the sum of 
-     *              themselves and the multiple of a the row y a scale
-     * @param source
-     * @param scale 
-     */
-    public void replaceRows(int source, double scale)
-    {
-        for(int i = 0; i < rowSize; i++)
-        {
-            if(i != source)
-                this.replace(source, i, scale);
-        }
-    }
-
-    
+      
     /**
      * Description: swaps row1 and row2 in the matrix
-     * @param row1
-     * @param row2 
+     * @param row1 The index of one of the two rows to be replaced
+     * @param row2 The index of one of the two rows to be replaced
      */
     public void interchange(int row1, int row2)
     {
@@ -346,8 +125,8 @@ public class Matrix{
     
     /**
      * Description: replaces the destination row with the sum of itself and the
-     *              multiple of the source row by a scale 
-     *              of the source
+              multiple of the source row by a scaleRow 
+              of the source
      * @param source
      * @param destination
      * @param scale 
@@ -366,7 +145,7 @@ public class Matrix{
      * @param row
      * @param scalar 
      */
-    public void scale(int row, double scalar)
+    public void scaleRow(int row, double scalar)
     {
         for(int i = 0; i < colSize; i ++)
         {
@@ -375,132 +154,267 @@ public class Matrix{
         
         determinant /= scalar;
     }
-
     
     /**
-     * Description: returns the number of pivots found in the current instance's
-     *              matrix
-     * @return the number of pivots found in the current matrix
+     * Description: calculates and returns the determinant of the current matrix
+     *              instance.
+     * @return ret A double type that signifies the matrix's determinant.
      */
-    public int getPivotCount()
+    private double initDet()
     {
-        int pivotCount = -1;
+        double ret = Double.NaN;
+        Matrix temp;
         
-        return pivotCount;
-    }
-    
-    
-    /**
-     * Description: returns true if the current matrix is invertible, false if 
-     *              otherwise
-     * @return returns a boolean to signify if the matrix is invertible
-     */
-    public boolean isInvertible()
-    {
-        boolean invertible = true;
-        
-        if(getDeterminant() == 0)
-            invertible = false;
-        
-        return invertible;
-    }
-    
-    
-    /**
-     * Description: returns the Eigen value of the current matrix
-     * @return the Eigen value of the matrix.
-     */
-    public int getEigenVal(double [] vector)
-    {
-        int eigen = Integer.MAX_VALUE;
-        
-        return eigen;
-    }
-    
-    
-    /**
-     * Description: returns the Eigen vector of the the current matrix.
-     * @return the Eigen vector as an arraylist.
-     */
-    public ArrayList getEigenVec(double val)
-    {
-        ArrayList eigen = null;
-        
-        return eigen;
-    }
-    
-    
-    /**
-     * Description: returns the determinant of the matrix.
-     * @return the integer determinant of the matrix
-     */
-    public double getDeterminant()
-    {
-        return determinant;
-    }
-       
-    
-    
-    /**
-     * Description: returns the Complement of the matrix
-     * @return the Complement of the matrix
-     */
-    public Matrix getComplement()
-    {
-        Matrix comp = null;
-        
-        return comp;
-    }
-    
-    
-    /**
-     * Description: returns matrix that is the basis of the current matrix
-     * @return the basis of the current matrix.
-     */
-    public Matrix getBasis()
-    {
-        Matrix basis = null;
-        //call getRef and stuff
-        return basis;
-    }
-    
-    /**
-     * Description: returns the transpose of the current matrix
-     * @return the transpose of the current matrix
-     */
-    public Matrix getTranspose()
-    {
-        Matrix trans = new Matrix(this.colSize, this.rowSize, 
-                new double[colSize][rowSize]);
-  
-        for(int i = 0; i < rowSize; i ++)
+        if(isSquare())
         {
-            for(int j = 0; j < colSize; j++)
+            temp = getRREF();
+            ret = temp.matrix[0][0];
+            
+            for(int i = 1; i < temp.rowSize; i++)
             {
-                trans.setElement(j, i, this.matrix[j][i]);
+                ret *= temp.matrix[i][i];
+            }
+        }
+        return ret;
+    }
+    
+    /**
+     * Description: returns true if the current instance is a square matrix and 
+     *              false if otherwise.
+     * @return ret Boolean that signifies the condition of whether the current 
+     *              instance is a square matrix.
+     */
+    public boolean isSquare()
+    {
+        boolean ret = true;
+        if(rowSize != colSize)
+            ret = false;
+        return ret;
+    }
+    
+    /**
+     * Description: returns the Reduce Row Echelon form of the current matrix.
+     * @return temp a Matrix object
+     *///INCOMPLETE : ADD REVERSE SIMPLIFYING ROWS FROM BOTTOM TO TOP, ELSE IT
+        //IS JUST A ROW ECHELON FORM.
+    public Matrix getRREF()
+    {
+        Matrix temp = new Matrix(matrix);
+        
+        temp.getREF();
+        
+        //Add the last step of algorithm rising row reduction
+        
+        return temp;
+    }
+
+    /**
+     * Description : returns the Row Echelon Form of the current matrix 
+     *               instance.
+     * @return ref A Matrix Object meant to serve as the REF of the current
+     *             Matrix instance.
+     */
+    public Matrix getREF()
+    {
+        Matrix ref = null;
+        
+        if(this.matrix == null)
+            throw new NullPointerException();
+        else
+        {
+            ref = new Matrix(matrix);
+            int rowIndex = 0;
+            int colIndex = 0;
+            
+            while(rowIndex < rowSize && colIndex < colSize)
+            {
+                for(int i = rowIndex; i < rowSize; i++)
+                {
+                    if(ref.matrix[i][colIndex] != 0)
+                    {
+                        ref.scaleRow(i, 1.0 / ref.matrix[i][colIndex]);
+                        ref.replaceRows(i, -ref.matrix[i][colIndex]);
+                        ref.interchange(i, rowIndex);
+                        rowIndex++;
+                        colIndex++;
+                        break;
+                    }
+                }
             }
         }
         
-        return trans;
+        return ref;
     }
     
-    
-    public static Matrix multiply(Matrix var)
+    private void replaceRows(int source, double scale)
     {
-        
+        for(int j = 0; j < rowSize; j++)
+        {
+            if(j != source)
+                this.replace(source, j, -scale);
+        }
     }
     
-    public static Matrix add(Matrix var)
+    /**
+     * Description : returns true if the current Matrix instance is invertible
+     * @return ret A boolean to signify the invertible condition of a matrix.
+     */
+    public boolean isInvertible()
     {
+        boolean ret = true;
         
+        if(determinant == 0)
+            ret = false;
+        
+        return ret;
     }
     
-    public static Matrix subtract(Matrix var)
+    /**
+     * Description: returns the transpose of the current matrix instance. The 
+     *              return matrix will have the dimensions of the original but
+     *              reversed( ret.rowSize = original.colSize and
+     *              ret.colSize = original.rowSize)
+     * @return ret The Matrix object that serves as the transpose of the current
+     *             Matrix instance.
+     */
+    public Matrix getTranspose()
     {
+        Matrix ret = new Matrix(colSize, rowSize);
         
+        for(int i = 0; i < rowSize; i++)
+        {
+            for(int j = 0; j < colSize; j++)
+            {
+                ret.matrix[j][i] = matrix[i][j];
+            }
+        }
+        
+        return ret;
     }
     
+    /**
+     * Description: returns a new matrix from adding the current matrix instance
+     *              and the given argument.
+     * @param arg A Matrix object meant to be an operand for the add operation.
+     * @return ret A Matrix Object.
+     */
+    public Matrix add(Matrix arg)
+    {
+        Matrix ret = null;
+        
+        if(rowSize == arg.rowSize && colSize == arg.colSize)
+        {
+            ret = new Matrix(rowSize, colSize); 
+            for(int i = 0; i < rowSize; i++)
+            {
+                for(int j = 0; j < colSize; j++)
+                {
+                    ret.getMatrix()[i][j] = matrix[i][j] + arg.matrix[i][j];
+                }
+            }
+        }
+        
+        return ret;
+    }
     
+    /**
+     * Description: returns a new matrix from subtracting the current matrix 
+     *              instance and the given argument.
+     * @param arg A Matrix object meant to be an operand for the add operation.
+     * @return ret A Matrix Object.
+     */
+    public Matrix subtract(Matrix arg)
+    {
+        Matrix ret = null;
+        
+        if(rowSize == arg.rowSize && colSize == arg.colSize)
+        {
+            ret = new Matrix(rowSize, colSize); 
+            for(int i = 0; i < rowSize; i++)
+            {
+                for(int j = 0; j < colSize; j++)
+                {
+                    ret.getMatrix()[i][j] = matrix[i][j] - arg.matrix[i][j];
+                }
+            }
+        }
+        
+        return ret;
+    }
+    
+    /**
+     * Description: returns the multiple of the current matrix instance and the 
+     *              given matrix argument. Returns null if operation fails.
+     * @param arg
+     * @return ret A Matrix resultant of the matrix operation
+     */
+    public Matrix multiply(Matrix arg)
+    {
+        Matrix ret;
+        double[][] newMat = null;
+        
+        if(arg.rowSize == this.colSize)
+        {
+            newMat = new double[this.rowSize][arg.colSize];
+            for(int i = 0; i <  arg.colSize; i++)
+            {
+                for(int j = 0; j < arg.rowSize; j++)
+                {
+                    newMat[j][i] += this.matrix[i][j] * arg.matrix[j][i];
+                }
+            }
+        }
+        
+        ret = new Matrix(newMat);
+        
+        return ret;
+    }
+    
+    /**
+     * Description : returns the multiple of the matrix by a given scalar
+     *               argument.
+     * @param arg A double type serving as a scalar multiple of the matrix.
+     * @return ret A Matrix Object
+     */
+    public Matrix multiply(double arg)
+    {
+        Matrix ret = new Matrix(matrix);
+        
+        for(int i = 0; i < rowSize; i++)
+        {
+            for(int j = 0; j < colSize; j++)
+            {
+                ret.getMatrix()[i][j] = arg * ret.getMatrix()[i][j];
+            }
+        }
+        
+        return ret;
+    }
+    
+    /**
+     * Description: returns the string interpretation of the object
+     * @return ret A String interpretation of the object
+     */
+    @Override
+    public String toString()
+    {
+        String ret = "Matrix Info\n";
+        
+        for(int i = 0; i < rowSize; i++)
+        {
+            for(int j = 0; j < colSize; j++)
+            {
+                ret += matrix[i][j] + " ";
+            }
             
-    
+            ret += "\n";
+        }
+        
+        ret += "Row Size : " + rowSize;
+        ret += "Column Sze : " + colSize;
+        ret += "Determinant : " + determinant;
+        ret += "Invertible : " + isInvertible();
+        
+        return ret;
+    }     
 }//EOC
