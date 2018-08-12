@@ -1,0 +1,185 @@
+================================================================================
+WHITEBOARD 
+
+Description: A place to organize thoughts concerning the project.
+             Due to the instability of the creation process, expect this file to
+             undergo multiple changes.
+================================================================================
+-Development Notes-
+Current project performs matrix operations on a two dimensional array that acts
+as a matrix. The fall back is that this only allows 2x2 matrices to be supported
+by the users. This is not acceptable in a class implementation meant to create a
+general tool to handle all matrices in any quantifiable dimension.
+
+Project Needs a Refactor to solve this oversight.
+
+
+-Project Overview-
+    
+    *Classes
+        1) Matrix = Holds data and operations concerning matrices in mathematics
+        2) matrixTester = A test class used to debug the project's
+                            Functionalities. To be removed upon publication.
+
+    *Dependency Map
+        matrixTester <- Matrix
+
+    *Class Details
+        1) Matrix
+            //Global Variables
+                1) rowSize
+                2) colSIze
+                3) matrix
+                4) determinant
+            //Constructor
+                1) Matrix(Default)
+                2) Matrix(int, int)
+                3) Matrix(double[][])
+            //Methods
+                //Getters
+                    1) getRowSize
+                    2) getColSize  
+                    3) getMatrix
+                    4) getDet
+                //Setters 
+                    1) setMatrix
+                //Others
+                    1) interchange
+                    2) replace
+                    3) scale
+                    4) getREF
+                    5) getRREF
+                    6) calDet
+                    7) isInvertible
+                    8) getTranspose
+                    9) getEigenVec
+                   10) getEigenVal
+                   11) getBasis
+                   12) getComplement
+                   13) isSquare
+                   14) toString
+                   15) add
+                   17) sub
+                   18) multi
+            <Global Variable>
+                1) rowSize = Integer that represents the number of rows in the 
+                                matrix.
+                2) colSize = Integer that represents the number of columns in
+                                the matrix.
+                3) matrix = A two dimensional array of type double to store 
+                                numbers to represent the matrix.
+                4) determinant = the determinant of the matrix.
+            <Constructor>
+                1) Matrix(Default) = Initializes the class variable's with their 
+                                        default values.
+                2) Matrix(int, int) = Initiates the rowSize and colSize with the 
+                                        given two integer arguments. Also,
+                                        matrix is initialized with rowSize by
+                                        colSize dimensions.
+                3) Matrix(double[][]) = Initiates the matrix array to the given 
+                                        double[][] argument and uses its
+                                        dimensions to instantiate the rowSize
+                                        and colSize.
+            <Methods>
+                <Method-Getters>
+                    1) getRowSize = returns the rowSize global variable
+                    2) getColSize = returns the colSize global variable
+                    3) getMatrix =  returns the matrix global variable
+                    4) getDet = returns the determinant global variable
+                <Method-Setters>
+                    1) setMatrix =  sets the matrix global variable value
+                                    to a given argument
+                <Method-others>
+                    1) 
+                        Method Name : interchange
+                        Description : swaps row1 and row2 in the matrix
+                        @param row1 The index of one of the two rows to be 
+                                    replaced
+                        @param row2 The index of one of the two rows to be
+                                    replaced
+                        
+                    2) 
+                        Method Name: replace
+                        Description: replaces the destination row with the sum 
+                                     of itself and the multiple of the source 
+                                     row by a scale of the source
+                        @param source
+                        @param destination
+                        @param scale 
+                    3) 
+                        Method Name : scale
+                        Description : scales the row by a scalar
+                        @param row
+                        @param scalar 
+                    4) 
+                        Method Name : getRREF
+                        Description : returns the Reduce Row Echelon form of the
+                                      current matrix.
+                        @return temp a Matrix object
+                    5) 
+                        Method Name : getREF
+                        Description: returns the Reduce Row Echelon form of the 
+                                     current matrix.
+                        @return temp a Matrix object
+
+                    6) 
+                        Method Name : initDet
+                        Description : calculates and returns the determinant of 
+                                      the current matrix instance.
+                        @return ret A double type that signifies the matrix's 
+                                       determinant.
+                    7) 
+                        Method Name : isInvertible
+                        Description : returns true if the current Matrix            
+                                      instance is invertible
+                        @return ret A boolean to signify the invertible condition of a matrix.
+                    8) 
+                        Method Name : getTranspose
+                        Description: returns the transpose of the current matrix
+                                     instance. The return matrix will have the 
+                                     dimensions of the original but reversed
+                                     ( ret.rowSize = original.colSize and
+                                     ret.colSize = original.rowSize)
+                        @return ret The Matrix object that serves as the transpose of the current
+                                     Matrix instance.
+                   9) getComplement
+                   10) 
+                        Method Name : isSquare
+                        Description : returns true if the current instance is a square matrix and 
+                                      false if otherwise.
+                        @return ret Boolean that signifies the condition of whether the current 
+                        instance is a square matrix.
+                   11) 
+                        Method Name : toString
+                        Description : returns the string interpretation of the 
+                                      object
+                        @return ret A String interpretation of the object
+                   12) 
+                        Method Name : add
+                        Description : returns a new matrix from adding the current matrix instance
+                                      and the given argument.
+                        @param arg A Matrix object meant to be an operand for the add operation.
+                        @return ret A Matrix Object.
+                   13) 
+                        Method Name : sub
+                        Description: returns a new matrix from subtracting the 
+                        current matrix instance and the given argument.
+                        @param arg A Matrix object meant to be an operand for the add operation.
+                        @return ret A Matrix Object.
+                   14) 
+                        Method Name : multiply
+                        Description : returns the multiple of the current matrix
+                                      instance and the given matrix argument. 
+                                      Returns null if operation fails.
+                        @param arg
+                        @return ret A Matrix resultant of the matrix operation
+                   15)
+                        Method Name : multiply(overload)
+                        Description : returns the multiple of the matrix by a
+                                      given scalar argument.
+                        @param arg A double type serving as a scalar multiple of the matrix.
+                        @return ret A Matrix Object
+                   16) Method Name: getSubMatrix
+
+
+                    
