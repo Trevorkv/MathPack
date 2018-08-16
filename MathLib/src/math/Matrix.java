@@ -38,7 +38,7 @@ public class Matrix{
         rowSize = row;
         colSize = col;        
         matrix = new double[rowSize][colSize];
-        determinant = initDet();
+        determinant = 0;
     }
 
     /**
@@ -47,10 +47,8 @@ public class Matrix{
      */
     public Matrix(double[][] matrix)
     {
-        rowSize = matrix.length;
-        rowSize = matrix[0].length;
-        this.matrix = matrix;
-        determinant = initDet();
+        setMatrix(matrix);
+        determinant = 0;
     }
     
     /**
@@ -68,7 +66,7 @@ public class Matrix{
      * @return colSize Integer that represents the number of columns in
                         the matrix.
      */
-    public int getcolSize()
+    public int getColSize()
     {
         return colSize;
     }
@@ -88,8 +86,10 @@ public class Matrix{
      * @return determinant A double type representing the determinant of the 
      *          matrix.
      */
+
     public double getDet()
     {
+        initDet();
         return determinant;
     }
 
@@ -97,30 +97,47 @@ public class Matrix{
      * Description: assigns a new value to the matrix variable
      * @param matrix a two dimensional array of type double
      */
-    public void setMatrix(double[][] matrix) {
-        this.matrix = matrix;
-        rowSize = this.matrix.length;
-        colSize = this.matrix[0].length;
+    public void setMatrix(double[][] matrix) 
+    {
+        try{
+            this.matrix = new double[matrix.length][matrix[0].length];
+            rowSize = this.matrix.length;
+            colSize = this.matrix[0].length;
+
+            for(int i = 0; i < rowSize; i++)
+            {
+                for(int j = 0; j < colSize; j++)
+                {
+                    this.matrix[i][j] = matrix[i][j];
+                }
+            }
+        }catch(ArrayIndexOutOfBoundsException e)
+        {
+            System.out.println(e + "\nInconsistency found in matrix dimensions"
+                    + "\nThe remaining elements have been initialized to 0");
+        }
     }
       
     /**
      * Description: swaps row1 and row2 in the matrix
      * @param row1 The index of one of the two rows to be replaced
      * @param row2 The index of one of the two rows to be replaced
+     * @return temp The resulting Matrix after an interchange row operation.
      */
-    public void interchange(int row1, int row2)
+    public Matrix interchange(int row1, int row2)
     {
         //temporary storage
+        Matrix temp = new Matrix(matrix);
         double[]first = new double[colSize];
+        
         for(int i = 0; i < colSize; i++)
         {
-            first[i] = matrix[row1][i];
-            matrix[row1][i] = matrix[row2][i];
-            matrix[row2][i] = first[i];
+            first[i] = temp.matrix[row1][i];
+            temp.matrix[row1][i] = temp.matrix[row2][i];
+            temp.matrix[row2][i] = first[i];
         }
-        
-        this.determinant *= -1;
     
+        return temp;
     }
     
     /**
@@ -130,29 +147,41 @@ public class Matrix{
      * @param source
      * @param destination
      * @param scale 
+     * @return temp The resulting Matrix after a replace row  operation.
      */
-    public void replace(int source, int destination, double scale)
+    public Matrix replace(int source, int destination, double scale)
     {
-       for(int i = 0; i < colSize; i ++)
+        Matrix temp = null;
+        if(source != destination)
         {
-            matrix[destination][i] = scale * matrix[source][i];
-        } 
+             temp = new Matrix(matrix);
+             
+             for(int i = 0; i < colSize; i ++)
+             {
+                 temp.matrix[destination][i] = scale * temp.matrix[source][i] + 
+                         temp.matrix[destination][i];
+             } 
+        }
        
+       return temp;
     }
     
     /**
      * Description: scales the row by a scalar
      * @param row
      * @param scalar 
+     * @return temp The resulting Matrix after a row scale operation.
      */
-    public void scaleRow(int row, double scalar)
+    public Matrix scaleRow(int row, double scalar)
     {
+        Matrix temp = new Matrix(matrix);
+        
         for(int i = 0; i < colSize; i ++)
         {
-            matrix[row][i] = scalar * matrix[row][i];
+            temp.matrix[row][i] = scalar * temp.matrix[row][i];
         }
         
-        determinant /= scalar;
+        return temp;
     }
     
     /**
@@ -160,22 +189,52 @@ public class Matrix{
      *              instance.
      * @return ret A double type that signifies the matrix's determinant.
      */
-    private double initDet()
-    {
-        double ret = Double.NaN;
-        Matrix temp;
-        
-        if(isSquare())
+    private void initDet()
+    {//consider usig other methods to find the det
+        Matrix ref = new Matrix(matrix);
+        double det = 0;
+        int rowIndex = 0;
+        int colIndex = 0;
+        int rowComplete = 0;
+        double scale = Double.NaN;
+
+        while(rowIndex < rowSize && colIndex < colSize)
         {
-            temp = getRREF();
-            ret = temp.matrix[0][0];
-            
-            for(int i = 1; i < temp.rowSize; i++)
-            {
-                ret *= temp.matrix[i][i];
+            if(ref.matrix[rowIndex][colIndex] != 0)
+            {          
+                det = 1;
+                scale = ref.matrix[rowIndex][colIndex];
+                ref = ref.scaleRow(rowIndex, 
+                        1.0 / scale);
+                det *= scale;
+                ref = ref.replaceBottomRows(rowIndex, colIndex);
+                
+                if(rowIndex != rowComplete)
+                {
+                    ref = ref.interchange(rowIndex, rowComplete);
+                    det *= -1;
+                }
             }
+            else if(rowIndex < rowSize -1)
+            {
+                ref = ref.interchange(rowIndex, rowSize-1);
+                det *= -1;
+            }
+            
+            rowComplete++;
+            rowIndex = rowComplete;
+            colIndex++;
         }
-        return ret;
+        
+        determinant = det;
+    }
+    
+    public Matrix getSubMatrix(int startRow, int endRow, int startCol,
+            int endCol)
+    {
+        Matrix temp = new Matrix(endRow-startRow, endCol-startCol);
+        
+        return temp;
     }
     
     /**
@@ -195,17 +254,36 @@ public class Matrix{
     /**
      * Description: returns the Reduce Row Echelon form of the current matrix.
      * @return temp a Matrix object
-     *///INCOMPLETE : ADD REVERSE SIMPLIFYING ROWS FROM BOTTOM TO TOP, ELSE IT
-        //IS JUST A ROW ECHELON FORM.
+     */
     public Matrix getRREF()
     {
-        Matrix temp = new Matrix(matrix);
+        Matrix ref = new Matrix(matrix);
+        int rowIndex = 0;
+        int colIndex = 0;
+        int rowComplete = 0;
+        double scale;
+
+        while(rowIndex < rowSize && colIndex < colSize)
+        {
+            if(ref.matrix[rowIndex][colIndex] != 0)
+            {                
+                scale = ref.matrix[rowIndex][colIndex];
+                ref = ref.scaleRow(rowIndex, 
+                        1.0 / scale);
+                ref = ref.replaceRows(rowIndex, colIndex);
+                
+                if(rowIndex != rowComplete)
+                    ref = ref.interchange(rowIndex, rowComplete);
+            }
+            else if(rowIndex < rowSize -1)
+                ref = ref.interchange(rowIndex, rowSize-1);
+            
+            rowComplete++;
+            rowIndex = rowComplete;
+            colIndex++;
+        }
         
-        temp.getREF();
-        
-        //Add the last step of algorithm rising row reduction
-        
-        return temp;
+        return ref;
     }
 
     /**
@@ -216,43 +294,95 @@ public class Matrix{
      */
     public Matrix getREF()
     {
-        Matrix ref = null;
-        
-        if(this.matrix == null)
-            throw new NullPointerException();
-        else
+        Matrix ref = new Matrix(matrix);
+        int rowIndex = 0;
+        int colIndex = 0;
+        int rowComplete = 0;
+        double scale;
+
+        while(rowIndex < rowSize && colIndex < colSize)
         {
-            ref = new Matrix(matrix);
-            int rowIndex = 0;
-            int colIndex = 0;
-            
-            while(rowIndex < rowSize && colIndex < colSize)
-            {
-                for(int i = rowIndex; i < rowSize; i++)
+            if(ref.matrix[rowIndex][colIndex] != 0)
+            {          
+                scale = ref.matrix[rowIndex][colIndex];
+                ref = ref.scaleRow(rowIndex, 
+                        1.0 / scale);
+                ref = ref.replaceBottomRows(rowIndex, colIndex);
+                
+                if(rowIndex != rowComplete)
                 {
-                    if(ref.matrix[i][colIndex] != 0)
-                    {
-                        ref.scaleRow(i, 1.0 / ref.matrix[i][colIndex]);
-                        ref.replaceRows(i, -ref.matrix[i][colIndex]);
-                        ref.interchange(i, rowIndex);
-                        rowIndex++;
-                        colIndex++;
-                        break;
-                    }
+                    ref = ref.interchange(rowIndex, rowComplete);
                 }
             }
+            else if(rowIndex < rowSize -1)
+            {
+                ref = ref.interchange(rowIndex, rowSize-1);
+            }
+            
+            rowComplete++;
+            rowIndex = rowComplete;
+            colIndex++;
         }
         
         return ref;
     }
     
-    private void replaceRows(int source, double scale)
+    private Matrix replaceRows(int source, int colLoc)
     {
+        Matrix temp = new Matrix(matrix);
+        double scale = 0;
+        
         for(int j = 0; j < rowSize; j++)
         {
+            scale = -temp.matrix[j][colLoc];
             if(j != source)
-                this.replace(source, j, -scale);
+                temp = temp.replace(source, j, scale);
         }
+        
+        return temp;
+    }
+    
+    private Matrix replaceBottomRows(int source, int colLoc)
+    {
+        Matrix temp = new Matrix(matrix);
+        double scale = 0;
+        
+        for(int j = source+1; j < rowSize; j++)
+        {
+            scale = -temp.matrix[j][colLoc];
+            temp = temp.replace(source, j, scale);
+        }
+        
+        return temp;
+    }
+    
+    /**
+     * Description : returns the Least Common Denominator from num1 and num2
+     * @param num1
+     * @param num2
+     * @return lcm is a Double signifying the Least Common Denominator
+     */
+    private double getLCM(double num1, double num2)
+    {
+        double lcm = 0l;
+        double least = num1 <= num2 ? num1 : num2;
+        double greatest = least == num1 ? num2 : num1;
+        
+        if(greatest % least == 0)
+            lcm = greatest;
+        else
+        {
+            for(int i = 1; i < greatest; i++)
+            {
+                if(least * i % greatest == 0)
+                {
+                    lcm = least * i;
+                    break;
+                }
+            }
+        }
+        
+        return lcm;
     }
     
     /**
@@ -262,8 +392,9 @@ public class Matrix{
     public boolean isInvertible()
     {
         boolean ret = true;
+        double det = getDet();
         
-        if(determinant == 0)
+        if(det == 0 || Double.isNaN(det))
             ret = false;
         
         return ret;
@@ -280,7 +411,6 @@ public class Matrix{
     public Matrix getTranspose()
     {
         Matrix ret = new Matrix(colSize, rowSize);
-        
         for(int i = 0; i < rowSize; i++)
         {
             for(int j = 0; j < colSize; j++)
@@ -350,7 +480,7 @@ public class Matrix{
      */
     public Matrix multiply(Matrix arg)
     {
-        Matrix ret;
+        Matrix ret = null;
         double[][] newMat = null;
         
         if(arg.rowSize == this.colSize)
@@ -358,14 +488,43 @@ public class Matrix{
             newMat = new double[this.rowSize][arg.colSize];
             for(int i = 0; i <  arg.colSize; i++)
             {
-                for(int j = 0; j < arg.rowSize; j++)
+                for(int j = 0; j < this.rowSize; j++)
                 {
-                    newMat[j][i] += this.matrix[i][j] * arg.matrix[j][i];
+                    newMat[j][i] = multiplyRowHelper(getRow(j), arg.getCol(i));
                 }
             }
+            
+            ret = new Matrix(newMat);
         }
         
-        ret = new Matrix(newMat);
+        return ret;
+    }
+    
+    private double multiplyRowHelper(double[] row, double [] col)
+    {
+        double ret = 0;
+        
+        for(int i = 0; i < row.length; i++)
+        {
+            ret += row[i] * col[i];
+        }
+        
+        return ret;
+    }
+    
+    private double[] getRow(int index)
+    {
+        return matrix[index];
+    }
+    
+    private double[] getCol(int index)
+    {
+        double [] ret = new double[colSize];
+        
+        for(int i = 0; i < rowSize; i++)
+        {
+            ret[i] = matrix[i][index];
+        }
         
         return ret;
     }
@@ -410,10 +569,10 @@ public class Matrix{
             ret += "\n";
         }
         
-        ret += "Row Size : " + rowSize;
-        ret += "Column Sze : " + colSize;
-        ret += "Determinant : " + determinant;
-        ret += "Invertible : " + isInvertible();
+        ret += "Row Size : " + rowSize + "\n";
+        ret += "Column Sze : " + colSize + "\n";
+        ret += "Determinant : " + getDet() + "\n";
+        ret += "Invertible : " + isInvertible() + "\n";
         
         return ret;
     }     
