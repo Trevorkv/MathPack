@@ -6,12 +6,7 @@ Description: A place to organize thoughts concerning the project.
              undergo multiple changes.
 ================================================================================
 -Development Notes-
-Current project performs matrix operations on a two dimensional array that acts
-as a matrix. The fall back is that this only allows 2x2 matrices to be supported
-by the users. This is not acceptable in a class implementation meant to create a
-general tool to handle all matrices in any quantifiable dimension.
 
-Project Needs a Refactor to solve this oversight.
 
 
 -Project Overview-
