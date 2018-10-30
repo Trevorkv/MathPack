@@ -1,4 +1,3 @@
-
 package math;
 
 import java.util.*;
@@ -59,31 +58,35 @@ public class RandomExperiment<T> {
     {
         double prob = 0;
         T[] event = events.get(index);
-        for(int i = 0; i < event.length; i++)
-        {
-            prob += binSearch(sampleSpace, event[i]) != null ? 1 : 0;
-            System.out.println("prob " + prob); 
+        
+        for (T event1 : event) {
+            prob += binSearch(sampleSpace, event1) >= 0 ? 1 : 0; 
         }
         
-        prob = prob / sampleSpace.length;
-        
+        prob = prob / sampleSpace.length; 
         return prob;
     }
-    //more testing required
-    private T binSearch(T[] array, T key)
+    
+    /**
+     * Description: runs a binary search on array to find key. Returns the index
+     *              of the key if found or -1 if key is not found.
+     * Date: 10/29/2018
+     * @param array
+     * @param key
+     * @return ret an int type storing the index of key or -1 if not found
+     */
+    private int binSearch(T[] array, T key)
     {
-        System.out.println("Key " + key);
-        T ret = null;
+        int ret = -1;
         int min = 0;
         int max = array.length;
         int mid = (min + max) / 2;
 
         while(true)
         {
-            System.out.println("min " + min + " max " + max  + " mid " + mid);
             if(key == array[mid])
             {
-                ret = array[mid];
+                ret = mid;
                 break;
             }
             else if(max == mid || min == mid)
@@ -99,7 +102,6 @@ public class RandomExperiment<T> {
                 mid = (min + max) / 2;
             }
         }
-        
         return ret;
     }
     
@@ -109,37 +111,60 @@ public class RandomExperiment<T> {
      */
     private void organizeEvents()
     {
-        organizeEventsHelper(this.sampleSpace);
+        this.sampleSpace = organizeEventsHelper(this.sampleSpace);
         
-        for (T[] event : events) {
-            organizeEventsHelper(event);
-        }
+        for(int i = 0; i < events.size(); i++)
+        {
+            events.set(i, organizeEventsHelper(events.get(i)));
+        }    
     }
     
     /**
-     * Description: Orders the Array's elements from least to greatest with 
-     *              selection sort
-     * @param array a Generic Type
-     * Date: 10/17/2018
+     * Description: Runs a modified selelction sort that deletes copies
+     * Date: 10/29/2018
+     * @param array
+     * @return T the sorted array 
      */
-    private void organizeEventsHelper(T[] array)
+    private T[] organizeEventsHelper(T[] array)
     {
-        for(int i = 0; i < array.length - 1; i++)
+        int finLength = array.length;
+        
+        for(int i = 0; i < finLength - 1; i++)
         {
-            for(int j = i+1; j < array.length; j++)
-            {   
-                if(array[i].toString().compareTo(array[j].toString()) == 0)
-                {
-                    
-                }
-                else if(array[i].toString().compareTo(array[j].toString()) >
-                        0)
+            for(int j = i+1; j < finLength; j++)
+            {                   
+                if(array[i].toString().compareTo(array[j].toString()) > 0)
                 {
                     swapElements(array, i, j);
-                    break;
                 }
+                else if(array[i].toString().compareTo(array[j].toString()) == 0)
+                {
+
+                    swapElements(array, j, finLength-1);
+                    finLength--;
+                    j--;
+                }  
             }
-        }
+        }    
+        
+        array = trimArray(array,finLength);
+        return array;
+    }
+    
+    /**
+     * Description: Returns a new array with index 0 to length
+     * Date: 10/29/2018
+     * @param array
+     * @param length
+     * @return T the new trimmed array
+     */
+    public T[] trimArray(T[] array, int length)
+    {
+        T ret[] = (T[])new Object[length];
+        
+        System.arraycopy(array, 0, ret, 0, length);
+        
+        return ret;
     }
     
     /**
@@ -178,19 +203,41 @@ public class RandomExperiment<T> {
     @Override
     public String toString()
     {
-        String ret = "Sample Space " + this.sampleSpace.length + "\n";
+        String ret = formatArray(this.sampleSpace, "Sample Space ");
+        ret += "Sample Space Length " + sampleSpace.length + "\n";
         
         for(int i = 0; i < events.size(); i++)
         {
-            ret += "Event " + i + "\n{";
-            for (T element : events.get(i)) {
-                ret += element + ",";
-            }
-            
-            ret += "}\n";
+            ret += formatArray(events.get(i), "Event " + i);
         }
         
         return ret;
     }
     
+    /**
+     * Description: returns a formatted array as a string
+     * Date: 10/29/2018
+     * @param array
+     * @param eventName
+     * @return String the string representation of the array
+     */
+    private String formatArray(T[] array, String eventName)
+    {
+        String ret = ""
+                ;
+        if(eventName == null || eventName.equals(""))
+            eventName = "Random Event";
+        
+        ret += eventName + " { ";
+        
+        for(int i = 0; i < array.length; i++)
+        {
+            if(i < array.length - 1)
+                ret += array[i] + ", ";
+            else
+                ret += array[i] + " }\n";
+        }
+        
+        return ret;
+    }
 }

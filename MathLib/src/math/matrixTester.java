@@ -19,7 +19,7 @@ public class matrixTester {
     
     public static void main(String Args[])
     {
-        double test[][] = {{1,2,3},{1,6,6}, {2,4,8}, {12,51,81}};
+        double test[][] = {{1,0,0},{0,0,2}, {1,1,1}};
         System.out.println("Initializing Matrix");
         Matrix me = new Matrix(test);
         System.out.println(me.toString());

@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package math;
 
 /**
@@ -17,6 +13,7 @@ public class Matrix{
     
     private double[][] matrix;
 
+    
     /**
      * Default Constructor
      */
@@ -27,6 +24,7 @@ public class Matrix{
         matrix = new double[rowSize][colSize];
         determinant = 0;
     }
+    
     
     /**
      * Overloaded Constructor
@@ -41,6 +39,7 @@ public class Matrix{
         determinant = 0;
     }
 
+    
     /**
      * Overloaded Constructor
      * @param matrix 
@@ -50,6 +49,7 @@ public class Matrix{
         setMatrix(matrix);
         determinant = 0;
     }
+    
     
     /**
      * Description: returns rowSize
@@ -61,6 +61,7 @@ public class Matrix{
         return rowSize;
     }
     
+    
     /**
      * Description: returns colSize
      * @return colSize Integer that represents the number of columns in
@@ -70,6 +71,7 @@ public class Matrix{
     {
         return colSize;
     }
+    
     
     /**
      * Description: returns matrix
@@ -81,18 +83,19 @@ public class Matrix{
         return matrix;
     }
     
+    
     /**
      * Description: returns determinant
      * @return determinant A double type representing the determinant of the 
      *          matrix.
      */
-
     public double getDet()
     {
         initDet();
         return determinant;
     }
 
+    
     /**
      * Description: assigns a new value to the matrix variable
      * @param matrix a two dimensional array of type double
@@ -118,6 +121,7 @@ public class Matrix{
         }
     }
       
+    
     /**
      * Description: swaps row1 and row2 in the matrix
      * @param row1 The index of one of the two rows to be replaced
@@ -139,6 +143,7 @@ public class Matrix{
     
         return temp;
     }
+    
     
     /**
      * Description: replaces the destination row with the sum of itself and the
@@ -166,6 +171,7 @@ public class Matrix{
        return temp;
     }
     
+    
     /**
      * Description: scales the row by a scalar
      * @param row
@@ -183,6 +189,7 @@ public class Matrix{
         
         return temp;
     }
+    
     
     /**
      * Description: calculates and returns the determinant of the current matrix
@@ -229,6 +236,15 @@ public class Matrix{
         determinant = det;
     }
     
+    
+    /**
+     * Description: returns a subMatrix from the current instance
+     * @param startRow
+     * @param endRow
+     * @param startCol
+     * @param endCol
+     * @return temp A matrix instance 
+     */
     public Matrix getSubMatrix(int startRow, int endRow, int startCol,
             int endCol)
     {
@@ -236,6 +252,7 @@ public class Matrix{
         
         return temp;
     }
+    
     
     /**
      * Description: returns true if the current instance is a square matrix and 
@@ -250,6 +267,7 @@ public class Matrix{
             ret = false;
         return ret;
     }
+    
     
     /**
      * Description: returns the Reduce Row Echelon form of the current matrix.
@@ -286,6 +304,7 @@ public class Matrix{
         return ref;
     }
 
+    
     /**
      * Description : returns the Row Echelon Form of the current matrix 
      *               instance.
@@ -327,6 +346,14 @@ public class Matrix{
         return ref;
     }
     
+    
+    /**
+     * Description: performs a replace row operation on every row excluding the 
+     *              source row
+     * @param source
+     * @param colLoc
+     * @return temp A matrix resultant after the matrix operation
+     */
     private Matrix replaceRows(int source, int colLoc)
     {
         Matrix temp = new Matrix(matrix);
@@ -342,6 +369,14 @@ public class Matrix{
         return temp;
     }
     
+    
+    /**
+     * Description: performs a replace row operation on every row below the 
+     *              source row
+     * @param source
+     * @param colLoc
+     * @return temp The matrix resultant after the operation
+     */
     private Matrix replaceBottomRows(int source, int colLoc)
     {
         Matrix temp = new Matrix(matrix);
@@ -355,6 +390,7 @@ public class Matrix{
         
         return temp;
     }
+    
     
     /**
      * Description : returns the Least Common Denominator from num1 and num2
@@ -385,6 +421,7 @@ public class Matrix{
         return lcm;
     }
     
+    
     /**
      * Description : returns true if the current Matrix instance is invertible
      * @return ret A boolean to signify the invertible condition of a matrix.
@@ -399,6 +436,7 @@ public class Matrix{
         
         return ret;
     }
+    
     
     /**
      * Description: returns the transpose of the current matrix instance. The 
@@ -421,6 +459,7 @@ public class Matrix{
         
         return ret;
     }
+    
     
     /**
      * Description: returns a new matrix from adding the current matrix instance
@@ -447,6 +486,7 @@ public class Matrix{
         return ret;
     }
     
+    
     /**
      * Description: returns a new matrix from subtracting the current matrix 
      *              instance and the given argument.
@@ -471,6 +511,7 @@ public class Matrix{
         
         return ret;
     }
+    
     
     /**
      * Description: returns the multiple of the current matrix instance and the 
@@ -529,6 +570,7 @@ public class Matrix{
         return ret;
     }
     
+    
     /**
      * Description : returns the multiple of the matrix by a given scalar
      *               argument.
@@ -549,6 +591,7 @@ public class Matrix{
         
         return ret;
     }
+    
     
     /**
      * Description: returns the string interpretation of the object
