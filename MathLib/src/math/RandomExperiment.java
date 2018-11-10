@@ -67,6 +67,20 @@ public class RandomExperiment<T> {
         return prob;
     }
     
+    public double getProb(T[] event)
+    {
+        double prob = 0;
+        
+        for(T e : event)
+        {
+            prob += binSearch(sampleSpace, e) >= 0 ? 1 : 0;
+        }
+        
+        prob = prob / sampleSpace.length;
+        
+        return prob;
+    }
+    
     /**
      * Description: runs a binary search on array to find key. Returns the index
      *              of the key if found or -1 if key is not found.
@@ -111,43 +125,49 @@ public class RandomExperiment<T> {
      */
     private void organizeEvents()
     {
-        this.sampleSpace = organizeEventsHelper(this.sampleSpace);
+        this.sampleSpace = organizeEventsHelper(this.sampleSpace, null);
         
         for(int i = 0; i < events.size(); i++)
         {
-            events.set(i, organizeEventsHelper(events.get(i)));
+            events.set(i, organizeEventsHelper(events.get(i), 
+                    sampleSpace[sampleSpace.length-1]));
         }    
     }
     
     /**
-     * Description: Runs a modified selelction sort that deletes copies
-     * Date: 10/29/2018
+     * Description: Runs a modified bubble sort that deletes copies and elements
+     *              of events that are not members of the sample space.
+     * Date: 11/04/2018
      * @param array
+     * @param key
      * @return T the sorted array 
      */
-    private T[] organizeEventsHelper(T[] array)
+    private T[] organizeEventsHelper(T[] array, T key)
     {
         int finLength = array.length;
-        
-        for(int i = 0; i < finLength - 1; i++)
+        int j;
+        for(int i = 0; i < finLength; i++)
         {
-            for(int j = i+1; j < finLength; j++)
-            {                   
-                if(array[i].toString().compareTo(array[j].toString()) > 0)
-                {
-                    swapElements(array, i, j);
-                }
-                else if(array[i].toString().compareTo(array[j].toString()) == 0)
-                {
-
-                    swapElements(array, j, finLength-1);
-                    finLength--;
-                    j--;
-                }  
+            j = finLength-1;
+            while(j > i)
+            {
+                if(array[j].toString().compareTo(array[j-1].toString()) < 0)
+                    swapElements(array, j, j-1);
+                else if(array[j].toString().compareTo(array[j-1].toString()) 
+                        == 0)
+                    swapElements(array, j++, --finLength);
+                j--;
             }
-        }    
-        
-        array = trimArray(array,finLength);
+            
+            if(key != null && array[i].toString().
+                    compareTo(key.toString()) > 0)
+            {
+                System.out.println(array[i]);
+                finLength = i;
+                break;
+            }
+        }
+        array = trimArray(array, finLength);
         return array;
     }
     
@@ -192,6 +212,107 @@ public class RandomExperiment<T> {
         T[] temp = events.get(i);
         events.set(i, events.get(j));
         events.set(j, temp);        
+    }
+    
+    /**
+     * Description: Returns a union set of type T between the specified events
+     *              in the event list of the sample space
+     * @param e1
+     * @param e2
+     * @return a T array that is the union of two specified events of the space.
+     * Date: 11/03/2018
+     */
+    public T[] getUnion(int e1, int e2) 
+    {
+        ArrayList<T> ret = new ArrayList<>();
+        T[] event1 = events.get(e1);
+        T[] event2 = events.get(e2);
+        int i = 0;
+        int j = 0;
+        
+        while(true)
+        {
+            if(i < event1.length && j == event2.length)
+                ret.add(event1[i++]);
+            else if(j < event2.length && i == event1.length)
+                ret.add(event2[j++]);
+            else if(i == event1.length && j == event2.length)
+                break;    
+            else if(event1[i].toString().
+                    compareTo(event2[j].toString()) < 0)
+                ret.add(event1[i++]);
+            else if(event1[i].toString().
+                    compareTo(event2[j].toString()) > 0)
+                ret.add(event2[j++]);
+            else if(event1[i].toString().
+                    compareTo(event2[j].toString()) == 0)
+            {
+                ret.add(event1[i++]);
+                j++;
+            } 
+        }
+        return (T[])ret.toArray();
+    }
+   
+    /**
+     * Description: Returns an array with elements that appeared in both 
+     *              specified events from the event list
+     * @param e1
+     * @param e2
+     * @return T is an array of the intersection of two events
+     * Date: 11/03/2018
+     */
+    public T[] getIntersection(int e1, int e2)
+    {
+        ArrayList<T> ret = new ArrayList<>();
+        T[] prime = events.get(e1).length < events.get(e2).length ? 
+                events.get(1) : events.get(e2);
+        T[] beta = prime != events.get(e1) ? events.get(e1) : events.get(e2);
+        
+        int betaHolder = 0;
+        
+        for(int i = 0; i < prime.length; i++)
+        {
+            for(int j = betaHolder; j < beta.length; j++)
+            {
+                if(prime[i].toString().compareTo(beta[j].toString()) == 0)
+                    ret.add(prime[i]);
+                else if(prime[i].toString().compareTo(beta[j].toString()) < 0)
+                {
+                    betaHolder = j;
+                    break;
+                }
+            }
+        }
+        
+        return (T[])ret.toArray();
+    }
+    
+    public double getCondProb(int e1, int e2)
+    {
+        double ret = (double)getIntersection(e1,e2).length / sampleSpace.length 
+                / this.getProb(e2);
+        return ret;
+    }
+    
+    //later
+//    public void getDistribution()
+//    {
+//        
+//    }
+    
+    //findPMF maybe
+    //print poiison table
+    //print distribution table
+    //print distributuion table(int row)
+    
+    public boolean isDependent(int e1, int e2)
+    {
+        boolean ret = true;
+        
+        if( getProb(getIntersection(e1,e2).length) != getProb(e1) * getProb(e2))
+            ret = false;        
+        return ret;
     }
     
     /**
